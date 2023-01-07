@@ -1,13 +1,15 @@
-ban_dict = ["개새끼", "시발", "병신", "ㅂㅅ", "ㅅㅂ", "fuck"]
-status = True
+bad_word = ["개새끼", "시발", "병신", "ㅂㅅ", "ㅅㅂ", "fuck"]
+bad_word = []
+answer = 0
+add_words = 0
 
-print("챗봇 시작한다")
-while status:
-    bad_words = 0
-    chat = input("말해 : ")
-    for word in ban_dict:
-        if word in chat:
-            bad_words += 1
+def bads():
+    while True:
+        bad_words = 0
+        chat = input("말해 : ")
+        for word in bad_words:
+                if word in chat:
+                    bad_words += 1
     if chat == "꺼져":
         status = False
     if chat == "추가":
@@ -17,7 +19,6 @@ while status:
         else:
             ban_dict.append(add_word)
             print(f"{add_word} 단어가 금칙어 사전에 등록완료")
-        continue
     if bad_words == 0:
         print("야 맞았다")
     else:

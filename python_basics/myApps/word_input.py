@@ -52,14 +52,14 @@ def test():
     kor.close()
     eng.close()
 
-
-while True:
-    mode = input("1-단어입력 / 2-단어입력 / 3-앱 종료/n => ")
-    if mode == 3:
-        break
-    elif mode == 1:
-        word_in()
-    elif mode == 2:
-        test()
-    else:
-        print("잘못 입력")
+def sel():
+    while True:
+        mode = input("1-단어입력 / 2-단어입력 / 3-앱 종료/n => ")
+        if mode == 3:
+            break
+        elif mode == 1:
+            word_in()
+        elif mode == 2:
+            test()
+        else:
+            print("잘못 입력")
