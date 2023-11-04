@@ -11,6 +11,12 @@ screen = pygame.display.set_mode((screen_width, screen_height))
 #화면 타이틀 (제목창)
 pygame.display.set_caption("정시우 스파이더맨")
 
+#FPS
+clock = pygame.time.Clock()
+
+#이동속도 고정해주기
+character_speed = 1
+
 bg = pygame.image.load("pygame/source/bg.png")
 
 #스프라이트 불러오기
@@ -29,6 +35,7 @@ to_y = 0
 #이벤트 루프 - 종료까지 대기
 running = True
 while running:
+    dt = clock.tick(60)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
@@ -48,8 +55,8 @@ while running:
                 to_y = 0
 
     #추가한 이미지들을 화면에 띄우기
-    character_xPos += to_x
-    character_yPos += to_y
+    character_xPos += to_x * dt
+    character_yPos += to_y * dt
 
     # 가로 스크린내 안벗어나게
     if character_xPos < 0:
