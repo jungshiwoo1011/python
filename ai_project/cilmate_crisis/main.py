@@ -12,9 +12,13 @@ screen = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption("아쿠아베인")
 
 # 폰트 및 이미지 설정
-font = pygame.font.Font(None, 36)
-player_image = pygame.image.load("ai_project/cilmate_crisis/emage/motherfucker.png")  # 주인공 이미지 파일의 경로를 정확히 지정해주세요.
-enemy_image = pygame.image.load("ai_project/cilmate_crisis/emage/enemy.jpg")    # 적 이미지 파일의 경로를 정확히 지정해주세요.
+font = pygame.font.Font("c:/Windows/Fonts/malgun.ttf", 36)  # 맑은 고딕 폰트 사용
+player_image = pygame.image.load("ai_project/cilmate_crisis/emage/fuckinggoodguy.png")
+enemy_image = pygame.image.load("ai_project/cilmate_crisis/emage/motherfucker2.png")
+background_image = pygame.image.load("ai_project/cilmate_crisis/emage/fuckingdoor.jpg")
+
+# 배경 이미지 크기를 화면 크기로 조절
+background_image = pygame.transform.scale(background_image, (screen_width, screen_height))
 
 # 색깔 정의
 black = (0, 0, 0)
@@ -25,17 +29,16 @@ red = (255, 0, 0)
 player_size = 50
 player_x = screen_width // 2 - player_size // 2
 player_y = screen_height - 2 * player_size
-player_speed = 5
+player_speed = 20
 
 # 무기 설정
-bullet_image = pygame.Surface((5, 10))
-bullet_image.fill(white)
 bullets = []
 bullet_speed = 10
 
 # 적 설정
 enemies = []
-enemy_speed = 3
+enemy_speed = 10  # 적이 움직이는 속도 조절
+enemy_spawn_frequency = 60  # 적 생성 빈도 조절 (숫자가 클수록 적이 적게 나옴)
 
 # 시작 화면 텍스트 및 이미지 설정
 intro_text = [
@@ -50,6 +53,10 @@ intro_text = [
     "하지만 늘 사람들의 위협에는 문제가 생긴다",
     "그것도 범죄자 같은 사람들. 그 사람들로부터 집을 보호하기 위해 부대에서 가져온 장비들로 처단해야한다"
 ]
+
+# 게임오버 텍스트 설정
+game_over_text = font.render("게임 오버! 스페이스 키를 누르면 재시작", True, red)
+game_over_rect = game_over_text.get_rect(center=(screen_width // 2, screen_height // 2))
 
 # 텍스트 및 이미지 렌더링
 text_y = screen_height // 2 - len(intro_text) * 15
@@ -66,48 +73,79 @@ pygame.display.flip()
 pygame.time.wait(5000)
 
 # 게임 루프
+frame_count = 0
+game_over = False
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
 
-    # 사용자 입력 처리
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_LEFT] and player_x > 0:
-        player_x -= player_speed
-    if keys[pygame.K_RIGHT] and player_x < screen_width - player_size:
-        player_x += player_speed
-    if keys[pygame.K_SPACE]:
-        bullets.append([player_x + player_size // 2, player_y])
+    if not game_over:
+        # 배경 그리기
+        screen.blit(background_image, (0, 0))
 
-    # 총알 이동 및 그리기
-    for bullet in bullets:
-        bullet[1] -= bullet_speed
-        pygame.draw.rect(screen, white, [bullet[0], bullet[1], 5, 10])
+        # 사용자 입력 처리
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_LEFT] and player_x > 0:
+            player_x -= player_speed
+        if keys[pygame.K_RIGHT] and player_x < screen_width - player_size:
+            player_x += player_speed
+        if keys[pygame.K_SPACE]:
+            bullets.append([player_x + player_size // 2, player_y])
 
-    # 적 생성
-    if random.randint(0, 100) < 3:
-        enemy_x = random.randint(0, screen_width - enemy_image.get_width())
-        enemy_y = 0
-        enemies.append([enemy_x, enemy_y])
+        # 총알 이동 및 그리기
+        for bullet in bullets:
+            bullet[1] -= bullet_speed
+            pygame.draw.rect(screen, white, [bullet[0], bullet[1], 5, 10])
 
-    # 적 이동 및 그리기
-    for enemy in enemies:
-        enemy[1] += enemy_speed
-        screen.blit(enemy_image, (enemy[0], enemy[1]))
+        # 적 생성
+        if frame_count % enemy_spawn_frequency == 0:
+            enemy_x = random.randint(0, screen_width - enemy_image.get_width())
+            enemy_y = 0
+            enemies.append([enemy_x, enemy_y])
 
-    # 충돌 체크
-    for bullet in bullets:
+        # 적 이동 및 그리기
         for enemy in enemies:
-            if (
-                bullet[0] < enemy[0] < bullet[0] + 5
-                and bullet[1] < enemy[1] < bullet[1] + 10
-            ):
-                bullets.remove(bullet)
-                enemies.remove(enemy)
+            enemy[1] += enemy_speed
+            screen.blit(enemy_image, (enemy[0], enemy[1]))
 
-    # 화면 업데이트
-    screen.fill(black)
-    screen.blit(player_image, (player_x, player_y))
-    pygame.display.flip()
+        # 충돌 체크
+        for bullet in bullets:
+            for enemy in enemies:
+                if (
+                    bullet[0] < enemy[0] + enemy_image.get_width()
+                    and bullet[0] + 5 > enemy[0]
+                    and bullet[1] < enemy[1] + enemy_image.get_height()
+                    and bullet[1] + 10 > enemy[1]
+                ):
+                    bullets.remove(bullet)
+                    enemies.remove(enemy)
+
+        # 플레이어 그리기
+        screen.blit(player_image, (player_x, player_y))
+
+        # 게임 오버 체크
+        for enemy in enemies:
+            if enemy[1] >= screen_height - enemy_image.get_height():
+                game_over = True
+
+        # 화면 업데이트
+        pygame.display.flip()
+
+        # 프레임 카운트 증가
+        frame_count += 1
+
+    else:  # 게임 오버 상태
+        screen.blit(game_over_text, game_over_rect)
+        pygame.display.flip()
+
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                # 게임 재시작
+                game_over = False
+                frame_count = 0
+                enemies = []
+                bullets = []
+
+    pygame.time.Clock().tick(30)
