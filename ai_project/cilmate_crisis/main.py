@@ -29,11 +29,11 @@ red = (255, 0, 0)
 player_size = 50
 player_x = screen_width // 2 - player_size // 2
 player_y = screen_height - 2 * player_size
-player_speed = 20
+player_speed = 30
 
 # 무기 설정
 bullets = []
-bullet_speed = 10
+bullet_speed = 30
 
 # 적 설정
 enemies = []
@@ -55,8 +55,14 @@ intro_text = [
 ]
 
 # 게임오버 텍스트 설정
-game_over_text = font.render("게임 오버! 스페이스 키를 누르면 재시작", True, red)
+game_over_text = font.render("게임 오버! 스페이스 키 눌러", True, red)
 game_over_rect = game_over_text.get_rect(center=(screen_width // 2, screen_height // 2))
+
+# 게임오버 메시지 설정
+def display_game_over(message):
+    game_over_message = font.render(message, True, red)
+    game_over_message_rect = game_over_message.get_rect(center=(screen_width // 2, screen_height // 2 - 50))
+    screen.blit(game_over_message, game_over_message_rect)
 
 # 텍스트 및 이미지 렌더링
 text_y = screen_height // 2 - len(intro_text) * 15
@@ -74,6 +80,7 @@ pygame.time.wait(5000)
 
 # 게임 루프
 frame_count = 0
+enemies_killed = 0
 game_over = False
 while True:
     for event in pygame.event.get():
@@ -121,6 +128,7 @@ while True:
                 ):
                     bullets.remove(bullet)
                     enemies.remove(enemy)
+                    enemies_killed += 1
 
         # 플레이어 그리기
         screen.blit(player_image, (player_x, player_y))
@@ -130,6 +138,11 @@ while True:
             if enemy[1] >= screen_height - enemy_image.get_height():
                 game_over = True
 
+        # 적 25명을 죽였을 때
+        if enemies_killed >= 25:
+            game_over = True
+            display_game_over("당신은 아지트를           지켰습니다!")
+
         # 화면 업데이트
         pygame.display.flip()
 
@@ -137,7 +150,11 @@ while True:
         frame_count += 1
 
     else:  # 게임 오버 상태
+        # 게임 오버 배경 그리기
+        screen.blit(background_image, (0, 0))
+
         screen.blit(game_over_text, game_over_rect)
+        display_game_over("fuck")  # 게임 오버 메시지 표시
         pygame.display.flip()
 
         for event in pygame.event.get():
@@ -147,5 +164,6 @@ while True:
                 frame_count = 0
                 enemies = []
                 bullets = []
+                enemies_killed = 0
 
     pygame.time.Clock().tick(30)
