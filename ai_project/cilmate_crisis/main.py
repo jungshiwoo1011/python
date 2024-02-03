@@ -12,13 +12,17 @@ screen = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption("아쿠아베인")
 
 # 폰트 및 이미지 설정
-font = pygame.font.Font("c:/Windows/Fonts/malgun.ttf", 36)  # 맑은 고딕 폰트 사용
+font = pygame.font.Font("c:/Windows/Fonts/malgun.ttf", 24)  # 맑은 고딕 폰트 사용 (글씨 크기를 24로 변경)
 player_image = pygame.image.load("ai_project/cilmate_crisis/emage/fuckinggoodguy.png")
 enemy_image = pygame.image.load("ai_project/cilmate_crisis/emage/motherfucker2.png")
-background_image = pygame.image.load("ai_project/cilmate_crisis/emage/fuckingdoor.jpg")
+background_image1 = pygame.image.load("ai_project/cilmate_crisis/emage/fuckingdoor.jpg")
+background_image2 = pygame.image.load("ai_project/cilmate_crisis/emage/fuckingdoor2.jpg")
+background_image3 = pygame.image.load("ai_project/cilmate_crisis/emage/fuckingdoor3.jpg")
 
 # 배경 이미지 크기를 화면 크기로 조절
-background_image = pygame.transform.scale(background_image, (screen_width, screen_height))
+background_image1 = pygame.transform.scale(background_image1, (screen_width, screen_height))
+background_image2 = pygame.transform.scale(background_image2, (screen_width, screen_height))
+background_image3 = pygame.transform.scale(background_image3, (screen_width, screen_height))
 
 # 색깔 정의
 black = (0, 0, 0)
@@ -29,18 +33,18 @@ red = (255, 0, 0)
 player_size = 50
 player_x = screen_width // 2 - player_size // 2
 player_y = screen_height - 2 * player_size
-player_speed = 30
+player_speed = 100
 
 # 무기 설정
 bullets = []
-bullet_speed = 30
+bullet_speed = 50
 
 # 적 설정
 enemies = []
-enemy_speed = 10  # 적이 움직이는 속도 조절
+enemy_speed = 15  # 적이 움직이는 속도 조절
 enemy_spawn_frequency = 60  # 적 생성 빈도 조절 (숫자가 클수록 적이 적게 나옴)
 
-# 시작 화면 텍스트 및 이미지 설정
+# 시작 화면 텍스트 설정
 intro_text = [
     "2050년 해수면 상승으로 의해 몰디브랑 일본이 잠겼다",
     "그다음으로 우리나라가 잠길 지경이다",
@@ -55,7 +59,7 @@ intro_text = [
 ]
 
 # 게임오버 텍스트 설정
-game_over_text = font.render("게임 오버! 스페이스 키 눌러", True, red)
+game_over_text = font.render("게임 오버! 스페이스 키를 누르면 재시작", True, red)
 game_over_rect = game_over_text.get_rect(center=(screen_width // 2, screen_height // 2))
 
 # 게임오버 메시지 설정
@@ -64,24 +68,24 @@ def display_game_over(message):
     game_over_message_rect = game_over_message.get_rect(center=(screen_width // 2, screen_height // 2 - 50))
     screen.blit(game_over_message, game_over_message_rect)
 
-# 텍스트 및 이미지 렌더링
-text_y = screen_height // 2 - len(intro_text) * 15
-for line in intro_text:
-    text = font.render(line, True, white)
-    text_rect = text.get_rect(center=(screen_width // 2, text_y))
-    screen.blit(text, text_rect)
-    text_y += 30
+# 인트로 텍스트 출력 함수
+def display_intro_text(index):
+    screen.blit(background_image1, (0, 0))
+    text_render = font.render(intro_text[index], True, white)
+    text_rect = text_render.get_rect(center=(screen_width // 2, screen_height // 2))
+    screen.blit(text_render, text_rect)
+    pygame.display.flip()
+    pygame.time.wait(2000)  # 2초 대기
 
-# 시작 화면 업데이트
-pygame.display.flip()
-
-# 대기 화면 (5초 동안 표시)
-pygame.time.wait(5000)
+# 인트로 텍스트 한 줄씩 출력
+for i in range(len(intro_text)):
+    display_intro_text(i)
 
 # 게임 루프
 frame_count = 0
 enemies_killed = 0
 game_over = False
+background_image = background_image1
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -138,10 +142,10 @@ while True:
             if enemy[1] >= screen_height - enemy_image.get_height():
                 game_over = True
 
-        # 적 25명을 죽였을 때
-        if enemies_killed >= 25:
-            game_over = True
-            display_game_over("당신은 아지트를           지켰습니다!")
+        # 적 10명을 죽였을 때
+        if enemies_killed >= 10:
+            background_image = background_image2  # 배경 변경
+            game_over = True  # 게임 종료
 
         # 화면 업데이트
         pygame.display.flip()
@@ -154,7 +158,7 @@ while True:
         screen.blit(background_image, (0, 0))
 
         screen.blit(game_over_text, game_over_rect)
-        display_game_over("fuck")  # 게임 오버 메시지 표시
+        display_game_over("다시 도전해보세요!")  # 게임 오버 메시지 표시
         pygame.display.flip()
 
         for event in pygame.event.get():
