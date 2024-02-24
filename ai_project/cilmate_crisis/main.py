@@ -9,7 +9,7 @@ pygame.init()
 screen_width = 800
 screen_height = 600
 screen = pygame.display.set_mode((screen_width, screen_height))
-pygame.display.set_caption("아쿠아베인")
+pygame.display.set_caption("아틀란티스")
 
 # 폰트 및 이미지 설정
 font = pygame.font.Font("c:/Windows/Fonts/malgun.ttf", 24)  # 맑은 고딕 폰트 사용 (글씨 크기를 24로 변경)
