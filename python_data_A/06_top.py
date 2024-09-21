@@ -26,9 +26,9 @@ for top in yp_top:
 
 yp_sort = [[], [], []]
 
-for kkk in yp_rank:
-    for y in range(len(kkk)):
-        yp_sort[y].append(kkk[y])
+for fff in yp_rank:
+    for y in range(len(fff)):
+        yp_sort[y].append(fff[y])
 
 print(yp_rank, yp_sort)
 
